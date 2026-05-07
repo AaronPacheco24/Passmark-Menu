@@ -15,14 +15,21 @@ def menu():
     print("-----Welcome to AXCA passmark----\
           \n1. Allied\
           \n2. Signify\
+          \n3. Locus\
           \n99. Exit"\
           "\n---------------------------------")
-    menuChoice = int(input("Please select a customer from above: "))
+    menuChoice = input("Please select a customer from above: ")
+    try:
+        menuChoice = int(menuChoice)
+    except ValueError:
+        return
     match menuChoice:
         case 1:
             print("Allied")
         case 2:
-            customer_kickoff.signify()
+            customer_kickoff.customer_specification("Signify")
+        case 3:
+            customer_kickoff.customer_specification("Locus")
         case 99:
             sys.exit()
 

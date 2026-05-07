@@ -1,0 +1,9 @@
+{
+    "41-000326-00":{
+        "CONFIG": "Y:\\Locus\\configs\\41-000326-00.cfg",
+        "BITCFG" : "Y:\\Locus\\41-000326-00\\41-000326-00.bitcfg", 
+        "PASSED" : "Y:\\Locus\\41-000326-00\\PASSED-LOGS\\",
+        "FAILED" : "Y:\\Locus\\41-000326-00\\FAILED-LOGS\\",
+        "RegEX": "^E[A-Z0-9]{15}$"
+    }
+}

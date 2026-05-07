@@ -6,10 +6,31 @@ import sys
 import subprocess
 import re
 import time
+import json
 from pathlib import Path
-from collections import defaultdict
+import shutil
 
 ## functions to be used again  
+
+def check_passmark(product_info , modelNum , serialNum ):
+    ## basic burnin report
+    burnin_report = "X:\\Program Files\\BurnInTest\\BIT_log.log"
+    unit_passed = True
+    ## see if fail exists
+    with open(burnin_report, "r", encoding="utf-16") as file:
+        lines = file.read().splitlines()
+    for line in lines:
+        if "FAIL" in line:
+            print("FAILURE-> " , line)
+            unit_passed = False
+            
+    ## if no failures put in pass directory
+    if unit_passed:
+        print(f"{serialNum} passed and was saved to passmark directory on server")
+        shutil.copy(burnin_report , f"{product_info[modelNum]["PASSED"]}\\{serialNum}.txt")
+    else:
+        print(f"{serialNum} failed and was saved to passmark directory on server")
+        shutil.copy(burnin_report , f"{product_info[modelNum]["FAILED"]}\\{serialNum}.txt")
 
 def compare_files( requiredParts ):
     localLog = r"X:\Program Files\BurnInTest\TempSysInfo.txt"
@@ -63,13 +84,19 @@ def parse_file(configFile):
     with localFile.open("r") as file:
         return [line[2:].strip() for line in file]
 
-## CUSTOMERS ##
 
-# signy kickoff
-def signify():
+# Customer kickoff specification
+def customer_specification( customer ):
+    ## open JSON file for future use
+    with open(f"Y:\\Passmark-Menu\\src\\product_info.json" , 'r') as file:
+        product_info = json.load(file)
     ## Verify model number exists
-    modelNum = input("Please enter model number for Signify: ")
-    configFile = (f"Y:\\Signify\\configs\\{modelNum}.cfg")
+    modelNum = input(f"Please enter model number for {customer}: ")
+    if not modelNum in product_info:
+        ## if model number does not exist in JSON file
+        print("Model Number not in JSON file: contact Engineering")
+        return
+    configFile = (product_info[modelNum]["CONFIG"])
     if not model_number_exists( configFile ):
         print("Please verify model number exists, contact Engineering if having issues")
         input()
@@ -79,8 +106,8 @@ def signify():
     requiredPart = parse_file( configFile )
 
     # verify the serial number regEx
-    serialNum = input("Please enter serial number for Signify: ")
-    if not verify_serial_number( serialNum  , r"^ATS\d{8}" ):
+    serialNum = input(f"Please enter serial number for {customer}: ")
+    if not verify_serial_number( serialNum  , product_info[modelNum]["RegEX"] ):
         print("Please verify serial number is correct, contact Engineering if having issues")
         input()
         return ## if model number does not exists put back at menu selection
@@ -101,10 +128,14 @@ def signify():
     time.sleep(3) ## sleep for the 3 seconds
     if not compare_files( requiredPart ):
         input("Press enter to return to Menu screen")
-    
-    ##if everything is good kick off burnin test!
-    print("Hardware checked passed running burnin test for Signify")
-    run_burnin(r"Y:\Signify\iPLAYER4.bitcfg")
+        return
+    else:
+        #if everything is good kick off burnin test!
+        print(f"Hardware checked passed running burnin test for {customer} -- {modelNum}")
+        run_burnin(product_info[modelNum]["BITCFG"])
+        check_passmark(product_info , modelNum  , serialNum )
+        input()
+
 
     
 
