@@ -1,40 +1,37 @@
-"""
-This will be the main file to kick off passmark files for AXCA
-Rev 1.00
-By Hayden Fortunata
-"""
-
-## Libraries
 import sys
 import os
 import customer_kickoff
 
-## Functions
+customer_list = ["Allied", "Signify", "Locus"]
+
 def menu():
-    # menu screen for passmark
-    print("-----Welcome to AXCA passmark----\
-          \n1. Allied\
-          \n2. Signify\
-          \n3. Locus\
-          \n99. Exit"\
-          "\n---------------------------------")
-    menuChoice = input("Please select a customer from above: ")
-    try:
-        menuChoice = int(menuChoice)
-    except ValueError:
-        return
-    match menuChoice:
-        case 1:
-            print("Allied")
-        case 2:
-            customer_kickoff.customer_specification("Signify")
-        case 3:
-            customer_kickoff.customer_specification("Locus")
-        case 99:
-            sys.exit()
+    print("-----Welcome to AXCA passmark----")
+    for index, customer in enumerate(customer_list, start=1):
+        print(f"          {index}. {customer}")
+    print("          Any other number to exit")
+    print("---------------------------------")
+    selection = None
+    while selection is None:
+        try:
+            user_input = int(input("Please select customer"))
+        except ValueError:
+            print("Please Enter a number")
+        else:
+            if user_input < 1 or user_input > len(customer_list):
+                selection = 0
+            else:
+                selection = user_input
+    return selection
+
+def main():
+    selection = menu()
+    if selection == 0:
+        sys.exit()
+    customer_kickoff.customer_specification(customer_list[selection-1])
 
 
 if __name__ == '__main__':
-    while True:
+    running = True
+    while running:
         os.system("cls")
-        menu()
+        main()
